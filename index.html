@@ -4057,11 +4057,21 @@ let   currentProfile = null; // { age, preferences: [] }
 let   goToCreatorAfterLogin = false;
 
 // Restore session from previous visit
+// Case-insensitive account lookup — returns the exact stored key or null
+function findAccount(name) {
+  if (!name) return null;
+  const lower = name.toLowerCase();
+  if (accounts[lower] !== undefined) return lower;
+  return Object.keys(accounts).find(k => k.toLowerCase() === lower) || null;
+}
+
 (function restoreSession() {
   const saved = localStorage.getItem('bored_session');
-  if (!saved || !accounts[saved]) return;
-  currentUser    = saved;
-  currentProfile = (userMeta[saved] && userMeta[saved].profile) || null;
+  if (!saved) return;
+  const key = findAccount(saved);
+  if (!key) return;
+  currentUser    = key;
+  currentProfile = (userMeta[key] && userMeta[key].profile) || null;
   updateUserChip();
   updateFriendBadge();
   applyProfile();
@@ -4102,33 +4112,37 @@ loginBtn.addEventListener('click', doAuth);
 });
 
 function doAuth() {
-  const user = document.getElementById('loginUser').value.trim().toLowerCase();
-  const pass = document.getElementById('loginPass').value.trim();
+  const rawUser = document.getElementById('loginUser').value.trim();
+  const pass    = document.getElementById('loginPass').value.trim();
   loginError.textContent = '';
-  if (!user || !pass) { loginError.textContent = 'Please fill in all required fields.'; return; }
+  if (!rawUser || !pass) { loginError.textContent = 'Please fill in all required fields.'; return; }
 
   const now = new Date().toISOString();
+  let user;
+
   if (loginMode === 'signup') {
+    user = rawUser.toLowerCase();
     const confirm = document.getElementById('loginConfirm').value.trim();
     if (pass !== confirm) { loginError.textContent = 'Passwords do not match.'; return; }
-    if (accounts[user])  { loginError.textContent = 'Username already taken. Try another.'; return; }
-    if (pass.length < 4) { loginError.textContent = 'Password must be at least 4 characters.'; return; }
+    if (findAccount(user)) { loginError.textContent = 'Username already taken. Try another.'; return; }
+    if (pass.length < 4)  { loginError.textContent = 'Password must be at least 4 characters.'; return; }
     const email = document.getElementById('loginEmail').value.trim().toLowerCase() || null;
     const age   = parseInt(document.getElementById('signupAge').value) || null;
     const phone = document.getElementById('signupPhone').value.trim() || null;
     const prefs = Array.from(document.querySelectorAll('.pref-btn.active')).map(b => b.dataset.pref);
     accounts[user] = pass;
     userMeta[user] = { signupDate: now, lastLogin: now, loginCount: 1, email, profile: { age, phone, preferences: prefs } };
-    localStorage.setItem('bored_accounts',   JSON.stringify(accounts));
-    localStorage.setItem('bored_user_meta',  JSON.stringify(userMeta));
+    localStorage.setItem('bored_accounts',  JSON.stringify(accounts));
+    localStorage.setItem('bored_user_meta', JSON.stringify(userMeta));
   } else {
-    if (!accounts[user] || accounts[user] !== pass) {
+    user = findAccount(rawUser);
+    if (!user || accounts[user] !== pass) {
       loginError.textContent = 'Incorrect username or password.';
       return;
     }
     if (!userMeta[user]) userMeta[user] = { signupDate: now, lastLogin: now, loginCount: 0 };
-    userMeta[user].lastLogin   = now;
-    userMeta[user].loginCount  = (userMeta[user].loginCount || 0) + 1;
+    userMeta[user].lastLogin  = now;
+    userMeta[user].loginCount = (userMeta[user].loginCount || 0) + 1;
     localStorage.setItem('bored_user_meta', JSON.stringify(userMeta));
   }
   currentUser    = user;
@@ -4848,30 +4862,30 @@ function sendFriendRequestPage() {
   if (target === currentUser) {
     msgEl.textContent = "That's you!"; msgEl.classList.add('err'); return;
   }
-  const accts = JSON.parse(localStorage.getItem('bored_accounts') || '{}');
-  if (!accts[target]) {
+  const storedTarget = findAccount(target);
+  if (!storedTarget) {
     msgEl.textContent = 'No account found for "' + target + '".'; msgEl.classList.add('err'); return;
   }
-  if (getFriends().includes(target)) {
-    msgEl.textContent = target + ' is already your friend.'; msgEl.classList.add('err'); return;
+  if (getFriends().includes(storedTarget)) {
+    msgEl.textContent = storedTarget + ' is already your friend.'; msgEl.classList.add('err'); return;
   }
-  if (getOutgoingRequests().includes(target)) {
-    msgEl.textContent = 'Request already sent to ' + target + '.'; msgEl.classList.add('err'); return;
+  if (getOutgoingRequests().includes(storedTarget)) {
+    msgEl.textContent = 'Request already sent to ' + storedTarget + '.'; msgEl.classList.add('err'); return;
   }
-  const allReqs = JSON.parse(localStorage.getItem('bored_friend_requests') || '{}');
-  if ((allReqs[currentUser] || []).some(r => r.from === target)) {
-    acceptRequest(target);
+  const allReqs = _safeJSON('bored_friend_requests', '{}');
+  if ((allReqs[currentUser] || []).some(r => r.from === storedTarget)) {
+    acceptRequest(storedTarget);
     input.value = '';
-    msgEl.textContent = target + ' already requested you — you\'re now friends!'; msgEl.classList.add('ok');
+    msgEl.textContent = storedTarget + ' already requested you — you\'re now friends!'; msgEl.classList.add('ok');
     setTimeout(() => { msgEl.textContent = ''; msgEl.className = 'fp-msg'; }, 3000);
     renderFriendsPage();
     return;
   }
-  if (!allReqs[target]) allReqs[target] = [];
-  allReqs[target].push({ from: currentUser, ts: Date.now() });
+  if (!allReqs[storedTarget]) allReqs[storedTarget] = [];
+  allReqs[storedTarget].push({ from: currentUser, ts: Date.now() });
   localStorage.setItem('bored_friend_requests', JSON.stringify(allReqs));
   input.value = '';
-  msgEl.textContent = 'Request sent to ' + target + '!'; msgEl.classList.add('ok');
+  msgEl.textContent = 'Request sent to ' + storedTarget + '!'; msgEl.classList.add('ok');
   setTimeout(() => { msgEl.textContent = ''; msgEl.className = 'fp-msg'; }, 2500);
   renderFriendsPage();
 }
