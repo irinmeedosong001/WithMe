@@ -3469,10 +3469,11 @@ let currentMood    = 'all';
 let currentCat     = 'all';
 let currentBrowseCat = 'all';
 let currentPage    = 'discover';
-let favorites      = JSON.parse(localStorage.getItem('bored_favs')    || '[]');
-let done           = JSON.parse(localStorage.getItem('bored_done')     || '[]');
-let customActs     = JSON.parse(localStorage.getItem('bored_custom')   || '[]');
-let hiddenIds      = JSON.parse(localStorage.getItem('bored_hidden')   || '[]');
+function _safeJSON(key, fallback) { try { return JSON.parse(localStorage.getItem(key) || fallback); } catch(e) { return JSON.parse(fallback); } }
+let favorites  = _safeJSON('bored_favs',    '[]');
+let done       = _safeJSON('bored_done',    '[]');
+let customActs = _safeJSON('bored_custom',  '[]');
+let hiddenIds  = _safeJSON('bored_hidden',  '[]');
 let spotlightId    = null;
 
 function allActivities() {
@@ -4004,8 +4005,8 @@ const loginScreen = document.getElementById('loginScreen');
 const loginBtn    = document.getElementById('loginBtn');
 const loginError  = document.getElementById('loginError');
 let   loginMode   = 'login'; // 'login' | 'signup'
-let   accounts    = JSON.parse(localStorage.getItem('bored_accounts')   || '{}');
-let   userMeta    = JSON.parse(localStorage.getItem('bored_user_meta') || '{}');
+let   accounts    = _safeJSON('bored_accounts',  '{}');
+let   userMeta    = _safeJSON('bored_user_meta', '{}');
 let   currentUser    = null;
 let   currentProfile = null; // { age, preferences: [] }
 let   goToCreatorAfterLogin = false;
