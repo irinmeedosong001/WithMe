@@ -25,6 +25,10 @@
       color: var(--text);
       min-height: 100vh;
       overflow-x: hidden;
+      padding-left: 130px;
+    }
+    @media (max-width: 640px) {
+      body { padding-left: 0; padding-bottom: 64px; }
     }
 
     /* Animated background */
@@ -616,22 +620,27 @@
 
     /* ── Top navigation ── */
     .top-nav {
-      position: sticky;
+      position: fixed;
+      left: 0;
       top: 0;
       z-index: 100;
-      background: rgba(237,227,208,0.94);
+      width: 130px;
+      height: 100vh;
+      background: rgba(237,227,208,0.97);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
-      border-bottom: 1px solid rgba(155,118,85,0.18);
+      border-right: 1px solid rgba(155,118,85,0.22);
       display: flex;
+      flex-direction: column;
       gap: 0;
-      margin: 0 -1rem 2rem;
-      padding: 0 1rem;
+      margin: 0;
+      padding: 1.5rem 0;
+      overflow-y: auto;
     }
 
     .nav-tab {
-      flex: 1;
-      padding: 0.85rem 0.5rem;
+      flex: 0 0 auto;
+      padding: 0.85rem 1.2rem;
       border: none;
       background: transparent;
       color: var(--muted);
@@ -639,16 +648,44 @@
       font-size: 0.88rem;
       font-weight: 600;
       font-family: inherit;
-      border-bottom: 3px solid transparent;
-      transition: color 0.2s, border-color 0.2s;
+      border-left: 3px solid transparent;
+      text-align: left;
+      transition: color 0.2s, border-color 0.2s, background 0.2s;
       white-space: nowrap;
     }
 
-    .nav-tab:hover { color: var(--text); }
+    .nav-tab:hover { color: var(--text); background: rgba(155,118,85,0.08); }
 
     .nav-tab.active {
       color: #5A8A40;
-      border-bottom-color: #5A8A40;
+      border-left-color: #5A8A40;
+      background: rgba(90,138,64,0.08);
+    }
+
+    @media (max-width: 640px) {
+      .top-nav {
+        position: fixed;
+        left: 0; top: auto; bottom: 0;
+        width: 100%; height: auto;
+        flex-direction: row;
+        padding: 0;
+        border-right: none;
+        border-top: 1px solid rgba(155,118,85,0.22);
+        overflow-y: visible;
+      }
+      .nav-tab {
+        flex: 1;
+        padding: 0.7rem 0.3rem;
+        border-left: none;
+        border-top: 3px solid transparent;
+        text-align: center;
+        font-size: 0.78rem;
+      }
+      .nav-tab.active {
+        border-left-color: transparent;
+        border-top-color: #5A8A40;
+        background: rgba(90,138,64,0.08);
+      }
     }
 
     .nav-tab .nav-badge {
