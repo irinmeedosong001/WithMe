@@ -3729,7 +3729,7 @@ document.getElementById('surpriseBtn').addEventListener('click', surprise);
 
 // Next
 document.getElementById('nextBtn').addEventListener('click', () => {
-  const pool = filtered().filter(a => a.id !== spotlightId);
+  const pool = discoverFiltered().filter(a => a.id !== spotlightId);
   if (!pool.length) return surprise();
   showSpotlight(pool[Math.floor(Math.random() * pool.length)].id);
 });
@@ -3866,12 +3866,7 @@ let timerInterval = null;
 document.getElementById('readyBtn').addEventListener('click', () => {
   const a = allActivities().find(x => x.id === spotlightId);
   if (!a) return;
-  document.getElementById('tsEmoji').textContent  = a.emoji;
-  document.getElementById('tsTitle').textContent  = a.title;
-  document.getElementById('tsSub').textContent    = `Suggested time: ${a.time}`;
-  document.getElementById('tsDuration').value     = parseDefaultMinutes(a.time);
-  updateTsHint();
-  document.getElementById('timerSetup').classList.add('open');
+  startTimer({ activityId: a.id, emoji: a.emoji, name: a.title, workMinutes: parseDefaultMinutes(a.time), breakCount: 0, breakMinutes: 5, split: 'equal' });
 });
 
 function updateTsHint() {
@@ -4512,6 +4507,7 @@ function renderUsers() {
 
 function renderCpDash() {
   renderStats();
+  renderUsers();
 }
 
 function deleteCustom(id) {
