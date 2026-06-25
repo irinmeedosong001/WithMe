@@ -26,9 +26,52 @@
       min-height: 100vh;
       overflow-x: hidden;
       padding-left: 40px;
+      padding-top: 44px;
     }
     @media (max-width: 640px) {
       body { padding-left: 0; padding-bottom: 64px; }
+    }
+
+    /* ── Top control bar ── */
+    .top-bar {
+      position: fixed;
+      top: 0;
+      left: 40px;
+      right: 0;
+      height: 44px;
+      z-index: 150;
+      background: rgba(237,227,208,0.96);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(155,118,85,0.22);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 5rem 0 1.4rem;
+      gap: 1rem;
+      font-family: 'Times New Roman', Times, serif;
+    }
+    .tb-date {
+      font-size: 0.82rem;
+      color: var(--muted);
+      font-style: italic;
+      white-space: nowrap;
+    }
+    .tb-time {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+    }
+    .tb-usage {
+      font-size: 0.8rem;
+      color: var(--muted);
+      font-style: italic;
+      white-space: nowrap;
+    }
+    @media (max-width: 640px) {
+      .top-bar { left: 0; }
     }
 
     /* Animated background */
@@ -63,7 +106,7 @@
     header {
       text-align: center;
       margin-bottom: 2rem;
-      padding-top: 3.5rem;
+      padding-top: 1rem;
     }
 
     header p {
@@ -1056,8 +1099,8 @@
     }
     .user-chip {
       position: fixed;
-      top: 1rem;
-      right: 1rem;
+      top: 8px;
+      right: 0.75rem;
       z-index: 200;
       font-size: 0.82rem;
       color: var(--muted);
@@ -2766,6 +2809,13 @@
 </div>
 
 <div class="container">
+  <!-- Top control bar -->
+  <div class="top-bar">
+    <span class="tb-date" id="tbDate"></span>
+    <span class="tb-time" id="tbTime"></span>
+    <span class="tb-usage" id="tbUsage"></span>
+  </div>
+
   <!-- Account button fixed top-right -->
   <button class="user-chip" id="userChip" onclick="openProfile()"></button>
 
@@ -3687,6 +3737,33 @@ document.getElementById('forYouBtn').addEventListener('click', () => {
 updateCounts();
 renderGrid();
 switchPage('discover');
+
+// ── Top bar: clock + session usage ──
+const _usageKey = 'bored_usage_today';
+const _todayStr = new Date().toDateString();
+let _usageStore = JSON.parse(localStorage.getItem(_usageKey) || 'null') || {};
+if (_usageStore.date !== _todayStr) _usageStore = { date: _todayStr, ms: 0 };
+const _sessionStart = Date.now();
+
+window.addEventListener('beforeunload', () => {
+  _usageStore.ms += Date.now() - _sessionStart;
+  localStorage.setItem(_usageKey, JSON.stringify(_usageStore));
+});
+
+function updateTopBar() {
+  const now = new Date();
+  document.getElementById('tbTime').textContent =
+    now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+  document.getElementById('tbDate').textContent =
+    now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+  const totalMs  = _usageStore.ms + (Date.now() - _sessionStart);
+  const mins     = Math.floor(totalMs / 60000);
+  const hrs      = Math.floor(mins / 60);
+  const usageTxt = hrs > 0 ? `${hrs}h ${mins % 60}m in app today` : `${mins}m in app today`;
+  document.getElementById('tbUsage').textContent = '⏱ ' + usageTxt;
+}
+setInterval(updateTopBar, 1000);
+updateTopBar();
 
 // ── Encouragement quotes — typewriter effect ──
 const DISCOVER_QUOTES = [
