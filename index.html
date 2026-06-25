@@ -4102,7 +4102,7 @@ loginBtn.addEventListener('click', doAuth);
 });
 
 function doAuth() {
-  const user = document.getElementById('loginUser').value.trim();
+  const user = document.getElementById('loginUser').value.trim().toLowerCase();
   const pass = document.getElementById('loginPass').value.trim();
   loginError.textContent = '';
   if (!user || !pass) { loginError.textContent = 'Please fill in all required fields.'; return; }
@@ -4453,8 +4453,9 @@ function renderLibrary() {
 }
 
 function renderUsers() {
-  const meta     = JSON.parse(localStorage.getItem('bored_user_meta') || '{}');
-  const userList = Object.keys(accounts);
+  const meta     = _safeJSON('bored_user_meta', '{}');
+  const freshAccounts = _safeJSON('bored_accounts', '{}');
+  const userList = Object.keys(freshAccounts);
   const totalLogins = userList.reduce((sum, u) => sum + (meta[u]?.loginCount || 0), 0);
 
   // Stats cards
@@ -4493,6 +4494,7 @@ function renderUsers() {
         <div class="user-avatar">${initials}</div>
         <div class="user-info">
           <div class="user-name">${u}${ageStr ? `<span style="font-weight:400;color:var(--muted);font-size:0.8rem;margin-left:0.5rem;">${ageStr}</span>` : ''}</div>
+          ${m.email ? `<div class="user-dates" style="margin-top:0.1rem;">✉️ ${m.email}</div>` : ''}
           <div class="user-dates">Joined ${signupStr} · Last seen ${lastStr}</div>
           <div class="user-dates" style="margin-top:0.2rem;">🎯 ${prefStr}</div>
         </div>
