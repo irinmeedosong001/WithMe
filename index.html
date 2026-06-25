@@ -3737,28 +3737,16 @@ renderGrid();
 switchPage('discover');
 
 // ── Top bar: clock + session usage ──
-const _usageKey = 'bored_usage_today';
-const _todayStr = new Date().toDateString();
-let _usageStore = JSON.parse(localStorage.getItem(_usageKey) || 'null') || {};
-if (_usageStore.date !== _todayStr) _usageStore = { date: _todayStr, ms: 0 };
-const _sessionStart = Date.now();
-
-window.addEventListener('beforeunload', () => {
-  _usageStore.ms += Date.now() - _sessionStart;
-  localStorage.setItem(_usageKey, JSON.stringify(_usageStore));
-});
-
 function updateTopBar() {
-  const now = new Date();
-  document.getElementById('tbTime').textContent =
-    now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
-  document.getElementById('tbDate').textContent =
-    now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
-  const totalMs  = _usageStore.ms + (Date.now() - _sessionStart);
-  const mins     = Math.floor(totalMs / 60000);
-  const hrs      = Math.floor(mins / 60);
-  const usageTxt = hrs > 0 ? `${hrs}h ${mins % 60}m in app today` : `${mins}m in app today`;
-  document.getElementById('tbUsage').textContent = '⏱ ' + usageTxt;
+  var now = new Date();
+  var tTime = document.getElementById('tbTime');
+  var tDate = document.getElementById('tbDate');
+  var tUsage = document.getElementById('tbUsage');
+  if (!tTime || !tDate || !tUsage) return;
+  tTime.textContent = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+  tDate.textContent = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+  var doneCount = done ? done.length : 0;
+  tUsage.textContent = doneCount === 1 ? '✓ 1 activity done' : '✓ ' + doneCount + ' activities done';
 }
 setInterval(updateTopBar, 1000);
 updateTopBar();
