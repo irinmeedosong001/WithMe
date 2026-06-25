@@ -2459,8 +2459,8 @@
       <input type="text" id="loginUser" placeholder="Enter your username" autocomplete="username" />
     </div>
     <div class="login-field" id="emailField" style="display:none">
-      <label for="loginEmail">Email</label>
-      <input type="email" id="loginEmail" placeholder="Enter your email" autocomplete="email" />
+      <label for="loginEmail">Email <span style="font-weight:400;color:var(--muted);font-size:0.8rem;">(optional — for password reset)</span></label>
+      <input type="email" id="loginEmail" placeholder="your@email.com" autocomplete="email" />
     </div>
     <div class="login-field">
       <label for="loginPass">Password</label>
@@ -4113,8 +4113,7 @@ function doAuth() {
     if (pass !== confirm) { loginError.textContent = 'Passwords do not match.'; return; }
     if (accounts[user])  { loginError.textContent = 'Username already taken. Try another.'; return; }
     if (pass.length < 4) { loginError.textContent = 'Password must be at least 4 characters.'; return; }
-    const email = document.getElementById('loginEmail').value.trim().toLowerCase();
-    if (!email) { loginError.textContent = 'Please enter your email address.'; return; }
+    const email = document.getElementById('loginEmail').value.trim().toLowerCase() || null;
     const age   = parseInt(document.getElementById('signupAge').value) || null;
     const phone = document.getElementById('signupPhone').value.trim() || null;
     const prefs = Array.from(document.querySelectorAll('.pref-btn.active')).map(b => b.dataset.pref);
