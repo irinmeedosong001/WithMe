@@ -25,7 +25,7 @@
       color: var(--text);
       min-height: 100vh;
       overflow-x: hidden;
-      padding-left: 156px;
+      padding-left: 200px;
     }
     @media (max-width: 640px) {
       body { padding-left: 0; padding-bottom: 64px; }
@@ -62,22 +62,13 @@
 
     header {
       text-align: center;
-      margin-bottom: 2.5rem;
-    }
-
-    header h1 {
-      font-size: clamp(2rem, 5vw, 3.2rem);
-      font-weight: 800;
-      color: #5A8A40;
-      background: none;
-      -webkit-text-fill-color: unset;
-      line-height: 1.2;
-      margin-bottom: 0.5rem;
+      margin-bottom: 2rem;
+      padding-top: 3.5rem;
     }
 
     header p {
       color: var(--muted);
-      font-size: 1.1rem;
+      font-size: 1rem;
     }
 
     /* Mood selector */
@@ -619,12 +610,22 @@
     }
 
     /* ── Top navigation ── */
+    .nav-brand {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--text);
+      padding: 1.4rem 1.2rem 1.2rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.01em;
+    }
+
     .top-nav {
       position: fixed;
       left: 0;
       top: 0;
       z-index: 100;
-      width: 156px;
+      width: 200px;
       height: 100vh;
       background: rgba(237,227,208,0.97);
       backdrop-filter: blur(10px);
@@ -634,8 +635,27 @@
       flex-direction: column;
       gap: 0;
       margin: 0;
-      padding: 1.5rem 0;
+      padding: 0;
       overflow-y: auto;
+    }
+
+    .top-nav .creator-btn {
+      margin-top: auto;
+      border-radius: 0;
+      border: none;
+      border-top: 1px solid var(--border);
+      border-left: 3px solid transparent;
+      width: 100%;
+      text-align: left;
+      padding: 0.9rem 1.2rem;
+      font-size: 0.88rem;
+      background: transparent;
+      color: var(--muted);
+    }
+    .top-nav .creator-btn:hover {
+      background: rgba(155,118,85,0.08);
+      color: #D4507A;
+      border-left-color: transparent;
     }
 
     .nav-tab {
@@ -673,6 +693,7 @@
         border-top: 1px solid rgba(155,118,85,0.22);
         overflow-y: visible;
       }
+      .nav-brand, .top-nav .creator-btn { display: none; }
       .nav-tab {
         flex: 1;
         padding: 0.7rem 0.3rem;
@@ -984,6 +1005,10 @@
       margin-bottom: 0.5rem;
     }
     .user-chip {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      z-index: 200;
       font-size: 0.82rem;
       color: var(--muted);
       background: var(--surface);
@@ -2691,22 +2716,22 @@
 </div>
 
 <div class="container">
+  <!-- Account button fixed top-right -->
+  <button class="user-chip" id="userChip" onclick="openProfile()"></button>
+
   <header>
-    <div class="header-row">
-      <button class="user-chip" id="userChip" onclick="openProfile()"></button>
-      <button class="creator-btn" id="openCreator">🏛️ Creator Portal</button>
-    </div>
-    <h1>ScreenReduce</h1>
     <p>Pick a vibe, hit the button, and go do something.</p>
   </header>
 
-  <!-- Top navigation -->
+  <!-- Left sidebar navigation -->
   <nav class="top-nav">
+    <div class="nav-brand">ScreenReduce</div>
     <button class="nav-tab active" data-page="discover">🎲 Discover</button>
     <button class="nav-tab" data-page="browse">🔍 Browse</button>
     <button class="nav-tab" data-page="favorites">🫒 Saved<span class="nav-badge" id="navFavCount"></span></button>
     <button class="nav-tab" data-page="done">🏺 Done<span class="nav-badge" id="navDoneCount"></span></button>
     <button class="nav-tab" data-page="friends">👥 Friends<span class="nav-badge" id="navFriendCount"></span></button>
+    <button class="creator-btn" id="openCreator">🏛️ Creator Portal</button>
   </nav>
 
   <!-- ── Page: Discover ── -->
